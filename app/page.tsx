@@ -6,6 +6,8 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { PriceHistoryModal } from "@/components/price-history-modal";
 import { getDefaultUser, getFavoriteProductIds, getProductsComparison, getStores } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   searchParams: Promise<{ q?: string }>;
 };

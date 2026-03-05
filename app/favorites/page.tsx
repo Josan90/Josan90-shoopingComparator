@@ -2,6 +2,8 @@ import Link from "next/link";
 import { FavoriteButton } from "@/components/favorite-button";
 import { getDefaultUser, getFavoriteProductIds, getProductsComparison } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export default async function FavoritesPage() {
   const user = await getDefaultUser();
   if (!user) {
