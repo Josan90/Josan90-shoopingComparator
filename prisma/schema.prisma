@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String?
+  favorites Favorite[]
+  createdAt DateTime   @default(now())
+}
+
+model Store {
+  id        Int             @id @default(autoincrement())
+  name      String
+  website   String?
+  aliases   ProductAlias[]
+  snapshots PriceSnapshot[]
+
+  @@unique([name])
+}
+
+model Product {
+  id        Int             @id @default(autoincrement())
+  name      String
+  brand     String?
+  category  String?
+  extraInfo String?         @db.Text
+  aliases   ProductAlias[]
+  snapshots PriceSnapshot[]
+  favorites Favorite[]
+}
+
+model ProductAlias {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  storeId   Int
+  alias     String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, storeId])
+}
+
+model PriceSnapshot {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  storeId     Int
+  price       Decimal  @db.Decimal(10, 2)
+  unitValue   Decimal? @db.Decimal(10, 3)
+  unitType    String?
+  pricePerRef Decimal? @db.Decimal(10, 4)
+  capturedAt  DateTime @default(now())
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([productId, capturedAt])
+  @@index([storeId, capturedAt])
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
