@@ -50,7 +50,7 @@ export default async function Home({ searchParams }: Props) {
 
         {products.length === 0 ? (
           <p className="empty-state">
-            No hay productos cargados en la base de datos. Puedes anadir uno con el boton "Nuevo producto".
+            No hay productos cargados en la base de datos. Puedes anadir uno con el boton Nuevo producto.
           </p>
         ) : (
           <>

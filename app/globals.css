@@ -458,7 +458,7 @@ label {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .result-head h3 {
@@ -810,7 +810,7 @@ tbody tr:hover {
 
   .forms-grid {
     grid-template-columns: 2fr 1fr;
-    align-items: start;
+    align-items: flex-start;
   }
 
   .edit-store-form {
