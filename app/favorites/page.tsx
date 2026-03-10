@@ -42,7 +42,7 @@ export default async function FavoritesPage() {
               {product.extraInfo ? <p className="muted">{product.extraInfo}</p> : null}
               <p>
                 Mejor precio:{" "}
-                <strong>{product.bestPrice ? `EUR ${product.bestPrice.toFixed(2)}` : "-"}</strong>
+                <strong>{product.bestPrice ? product.bestPrice.toFixed(2) : "-"}</strong>
               </p>
               <p>Tienda: {product.bestStore || "-"}</p>
               <FavoriteButton initiallyFavorite productId={product.productId} />

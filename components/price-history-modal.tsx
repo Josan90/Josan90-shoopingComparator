@@ -329,7 +329,7 @@ export function PriceHistoryModal({ productId, productName }: Props) {
                         <div className="chart-tooltip-row" key={row.storeName}>
                           <span className="legend-color" style={{ backgroundColor: row.color }} />
                           <span>{row.storeName}</span>
-                          <strong>{row.price == null ? "-" : `EUR ${row.price.toFixed(2)}`}</strong>
+                          <strong>{row.price == null ? "-" : row.price.toFixed(2)}</strong>
                         </div>
                       ))}
                     </div>
@@ -358,7 +358,7 @@ export function PriceHistoryModal({ productId, productName }: Props) {
                         <span>{series.storeName}</span>
                         <span className={`trend-badge ${trendLabel.toLowerCase()}`}>
                           {trendLabel}
-                          {series.trend !== 0 ? ` ${series.trend > 0 ? "+" : ""}${series.trend.toFixed(2)} EUR` : ""}
+                          {series.trend !== 0 ? ` ${series.trend > 0 ? "+" : ""}${series.trend.toFixed(2)}` : ""}
                         </span>
                       </div>
                     );
@@ -366,7 +366,7 @@ export function PriceHistoryModal({ productId, productName }: Props) {
                 </div>
 
                 <p className="muted">
-                  Min: EUR {chart.minPrice.toFixed(2)} | Max: EUR {chart.maxPrice.toFixed(2)}
+                  Min: {chart.minPrice.toFixed(2)} | Max: {chart.maxPrice.toFixed(2)}
                 </p>
               </>
             ) : (

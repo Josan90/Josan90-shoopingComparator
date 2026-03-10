@@ -134,7 +134,7 @@ export default async function Home({ searchParams }: Props) {
                   </p>
                   {product.extraInfo ? <p className="muted">{product.extraInfo}</p> : null}
                   <p>
-                    Mejor precio: <strong>{product.bestPrice ? `EUR ${product.bestPrice.toFixed(2)}` : "-"}</strong>
+                    Mejor precio: <strong>{product.bestPrice ? product.bestPrice.toFixed(2) : "-"}</strong>
                   </p>
                   <p>
                     Tienda destacada: <span className="badge">{product.bestStore || "-"}</span>
@@ -145,7 +145,7 @@ export default async function Home({ searchParams }: Props) {
                     ) : (
                       product.offers.map((offer) => (
                         <span className="offer-pill" key={`${product.productId}-${offer.storeName}`}>
-                          {offer.storeName}: EUR {offer.price.toFixed(2)}
+                          {offer.storeName}: {offer.price.toFixed(2)}
                         </span>
                       ))
                     )}
@@ -179,7 +179,7 @@ export default async function Home({ searchParams }: Props) {
                       </td>
                       <td>
                         <span className="price-highlight">
-                          {product.bestPrice ? `EUR ${product.bestPrice.toFixed(2)}` : "-"}
+                          {product.bestPrice ? product.bestPrice.toFixed(2) : "-"}
                         </span>
                       </td>
                       <td>
@@ -191,7 +191,7 @@ export default async function Home({ searchParams }: Props) {
                           <td key={`${product.productId}-${store.id}`}>
                             {offer ? (
                               <span className={offer.storeName === product.bestStore ? "store-price best" : "store-price"}>
-                                EUR {offer.price.toFixed(2)}
+                                {offer.price.toFixed(2)}
                               </span>
                             ) : (
                               <span className="store-price empty">-</span>

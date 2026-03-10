@@ -862,3 +862,116 @@ tbody tr:hover {
     display: none;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1326;
+    --bg-soft: #111a33;
+    --surface: #121d3a;
+    --surface-muted: #18264a;
+    --line: #2a3a67;
+    --text: #e8eeff;
+    --muted: #9eadcf;
+    --accent: #7ea0ff;
+    --accent-strong: #a1baff;
+    --accent-soft: #223466;
+    --danger: #ff7c9e;
+    --shadow: 0 18px 36px rgba(3, 8, 22, 0.45);
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 100% 0%, #20356f 0%, transparent 35%),
+      radial-gradient(circle at 0% 20%, #472045 0%, transparent 30%),
+      linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 240px);
+  }
+
+  .header {
+    background: rgba(13, 22, 45, 0.84);
+  }
+
+  .main-nav a,
+  input,
+  textarea,
+  .favorite-btn,
+  .action-icon,
+  .offer-pill,
+  .history-modal,
+  table {
+    background: #142346;
+    color: var(--text);
+    border-color: #2a3a67;
+  }
+
+  .btn-secondary {
+    background: #182b55;
+    color: #c9d7ff;
+    border-color: #3e5697;
+  }
+
+  .search-highlight {
+    background: #6d5a22;
+  }
+
+  .empty-state,
+  .chart-wrap,
+  .chart-tooltip-card,
+  .store-price,
+  .result-card,
+  tbody tr:nth-child(even),
+  tbody tr:hover {
+    background: #16274d;
+    color: var(--text);
+    border-color: #2c4173;
+  }
+
+  .store-edit-item,
+  .trend-item,
+  th {
+    background: #192c58;
+    color: #dce6ff;
+    border-color: #2c4173;
+  }
+
+  .price-highlight,
+  .store-price.best {
+    background: #243b75;
+    border-color: #4465b3;
+    color: #e3ecff;
+  }
+
+  .badge,
+  .legend-item {
+    background: #223a72;
+    color: #dce6ff;
+    border-color: #4568b8;
+  }
+
+  th,
+  td {
+    border-bottom-color: #2a3a67;
+  }
+
+  .chart-tooltip-row,
+  .toast,
+  .store-price.empty {
+    color: #ced9f8;
+  }
+
+  .toast {
+    background: #1a2b55;
+    border-color: #3b5497;
+  }
+
+  .toast.success {
+    background: #19354a;
+    border-color: #3b7860;
+    color: #b9f0d0;
+  }
+
+  .toast.error {
+    background: #48263a;
+    border-color: #9a4d69;
+    color: #ffd0df;
+  }
+}
