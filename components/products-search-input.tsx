@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { Route } from "next";
 
 type Props = {
   initialValue: string;
@@ -34,7 +35,7 @@ export function ProductsSearchInput({ initialValue }: Props) {
       }
 
       const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-      router.replace(nextUrl, { scroll: false });
+      router.replace(nextUrl as Route, { scroll: false });
     }, 220);
 
     return () => clearTimeout(handle);
