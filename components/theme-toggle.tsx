@@ -65,27 +65,30 @@ export function ThemeToggle() {
     >
       <button
         aria-pressed={theme === "light"}
+        aria-label="Modo dia"
         className={theme === "light" ? "theme-option is-active" : "theme-option"}
         onClick={() => updateTheme("light")}
         type="button"
       >
-        Dia
+        <span aria-hidden="true">☀️</span>
       </button>
       <button
         aria-pressed={theme === "dark"}
+        aria-label="Modo noche"
         className={theme === "dark" ? "theme-option is-active" : "theme-option"}
         onClick={() => updateTheme("dark")}
         type="button"
       >
-        Noche
+        <span aria-hidden="true">🌙</span>
       </button>
       <button
         aria-pressed={theme === "auto"}
+        aria-label="Modo automatico"
         className={theme === "auto" ? "theme-option is-active" : "theme-option"}
         onClick={() => updateTheme("auto")}
         type="button"
       >
-        Auto
+        <span aria-hidden="true">🖥️</span>
       </button>
     </div>
   );
