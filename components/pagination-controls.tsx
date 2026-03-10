@@ -1,7 +1,8 @@
+import type { Route } from "next";
 import Link from "next/link";
 
 type Props = {
-  pathname: string;
+  pathname: "/" | "/favorites";
   page: number;
   totalPages: number;
   query?: string;
@@ -20,7 +21,7 @@ export function PaginationControls({ pathname, page, totalPages, query }: Props)
     return null;
   }
 
-  function createHref(nextPage: number) {
+  function createHref(nextPage: number): Route {
     const params = new URLSearchParams();
 
     if (query) {
@@ -32,7 +33,7 @@ export function PaginationControls({ pathname, page, totalPages, query }: Props)
     }
 
     const search = params.toString();
-    return search ? `${pathname}?${search}` : pathname;
+    return (search ? `${pathname}?${search}` : pathname) as Route;
   }
 
   const pageNumbers = getPageNumbers(page, totalPages);
