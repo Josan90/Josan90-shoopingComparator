@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { FavoriteButton } from "@/components/favorite-button";
-import { getDefaultUser, getFavoriteProductIds, getProductsComparison } from "@/lib/data";
+import { getCurrentUser } from "@/lib/auth";
+import { getFavoriteProductIds, getProductsComparison } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export default async function FavoritesPage() {
-  const user = await getDefaultUser();
+  const user = await getCurrentUser();
   if (!user) {
-    return <p>No hay usuario por defecto configurado.</p>;
+    redirect("/login");
   }
 
   const [products, favoriteIds] = await Promise.all([

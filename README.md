@@ -6,7 +6,7 @@ Proyecto personal sencillo para comparar precios de productos entre supermercado
 
 - Comparador de productos con mejor precio por tienda
 - Buscador por nombre, marca o categoria
-- Favoritos por usuario
+- Favoritos por usuario autenticado (cuenta compartible)
 - Alta manual de productos con informacion extra y precios por supermercado
 - Esquema de datos con Prisma + PostgreSQL (Neon)
 - Seed con datos demo
@@ -40,6 +40,8 @@ Ejemplo:
 DATABASE_URL="postgresql://USER:PASSWORD@EP-XXXX-XXXX-pooler.us-east-1.aws.neon.tech/DBNAME?sslmode=require&pgbouncer=true&connect_timeout=15"
 DIRECT_URL="postgresql://USER:PASSWORD@EP-XXXX-XXXX.us-east-1.aws.neon.tech/DBNAME?sslmode=require&connect_timeout=15"
 DEFAULT_USER_EMAIL="demo@local.dev"
+DEFAULT_USER_PASSWORD="demo12345"
+AUTH_SECRET="una-clave-larga-de-32-o-mas-caracteres"
 ```
 
 4. Aplica esquema y genera cliente:
@@ -72,9 +74,17 @@ Abre `http://localhost:3000`.
 - `app/api/products/route.ts`: alta de producto y precios iniciales
 - `lib/data.ts`: logica de consulta y comparacion
 
-## Nota actual
+## Autenticacion
 
-La autenticacion no esta conectada todavia. Se usa un usuario por defecto via `DEFAULT_USER_EMAIL` para poder probar favoritos de forma inmediata.
+- Registro y login por email/password.
+- Sesion con cookie HTTP-only firmada.
+- Endpoints de escritura (`products`, `stores`, `favorites`) requieren sesion.
+- Puedes compartir una misma cuenta entre varias personas para tener la misma lista de favoritos.
+
+El seed crea (o actualiza) la cuenta inicial usando:
+
+- `DEFAULT_USER_EMAIL`
+- `DEFAULT_USER_PASSWORD`
 
 ## Vercel + Neon
 
@@ -83,5 +93,7 @@ En Vercel (Project Settings -> Environment Variables), define:
 - `DATABASE_URL` (Neon pooled URL)
 - `DIRECT_URL` (Neon direct URL)
 - `DEFAULT_USER_EMAIL`
+- `DEFAULT_USER_PASSWORD` (solo para seed inicial)
+- `AUTH_SECRET` (obligatorio en produccion)
 
 Con eso, cada deploy podra conectarse a Neon sin configuracion adicional en codigo.

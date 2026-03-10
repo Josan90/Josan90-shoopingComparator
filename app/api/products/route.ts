@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { getUserFromRequest, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 type ProductOfferInput = {
@@ -16,6 +17,11 @@ type ProductBody = {
 };
 
 export async function POST(request: NextRequest) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   const body = (await request.json()) as ProductBody;
 
   if (!body.name || body.name.trim().length < 2) {

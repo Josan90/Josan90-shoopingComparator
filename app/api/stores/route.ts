@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getUserFromRequest, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 type StoreBody = {
@@ -7,6 +8,11 @@ type StoreBody = {
 };
 
 export async function POST(request: NextRequest) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   const body = (await request.json()) as StoreBody;
   const name = body.name?.trim();
 

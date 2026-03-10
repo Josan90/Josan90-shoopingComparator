@@ -1,15 +1,21 @@
 import { Prisma } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import { prisma } from "../lib/prisma";
 
 async function main() {
   const userEmail = process.env.DEFAULT_USER_EMAIL || "demo@local.dev";
+  const userPassword = process.env.DEFAULT_USER_PASSWORD || "demo12345";
+  const passwordHash = await bcrypt.hash(userPassword, 12);
 
   const user = await prisma.user.upsert({
     where: { email: userEmail },
-    update: {},
+    update: {
+      passwordHash
+    },
     create: {
       email: userEmail,
-      name: "Demo"
+      name: "Demo",
+      passwordHash
     }
   });
 

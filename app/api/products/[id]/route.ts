@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { getUserFromRequest, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 type ProductOfferInput = {
@@ -19,6 +20,11 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   const { id } = await params;
   const productId = Number(id);
 
@@ -83,9 +89,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   const { id } = await params;
   const productId = Number(id);
 

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDefaultUser } from "@/lib/data";
+import { getUserFromRequest, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
-  const user = await getDefaultUser();
+  const user = await getUserFromRequest(request);
   if (!user) {
-    return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    return unauthorizedResponse();
   }
 
   const body = (await request.json()) as { productId?: number };
@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const user = await getDefaultUser();
+  const user = await getUserFromRequest(request);
   if (!user) {
-    return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    return unauthorizedResponse();
   }
 
   const body = (await request.json()) as { productId?: number };

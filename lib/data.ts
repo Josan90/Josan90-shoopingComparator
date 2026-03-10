@@ -17,11 +17,6 @@ export type ProductComparison = {
   }>;
 };
 
-export async function getDefaultUser() {
-  const email = process.env.DEFAULT_USER_EMAIL || "demo@local.dev";
-  return prisma.user.findUnique({ where: { email } });
-}
-
 export async function getProductsComparison(search?: string): Promise<ProductComparison[]> {
   const products = await prisma.product.findMany({
     where: search

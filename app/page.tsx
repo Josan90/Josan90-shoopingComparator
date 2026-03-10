@@ -1,10 +1,12 @@
+import { redirect } from "next/navigation";
 import { AddProductForm } from "@/components/add-product-form";
 import { AddStoreForm } from "@/components/add-store-form";
 import { DeleteProductButton } from "@/components/delete-product-button";
 import { EditProductForm } from "@/components/edit-product-form";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PriceHistoryModal } from "@/components/price-history-modal";
-import { getDefaultUser, getFavoriteProductIds, getProductsComparison, getStores } from "@/lib/data";
+import { getCurrentUser } from "@/lib/auth";
+import { getFavoriteProductIds, getProductsComparison, getStores } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +18,15 @@ export default async function Home({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = q?.trim();
 
-  const user = await getDefaultUser();
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
   const [products, stores, favoriteIds] = await Promise.all([
     getProductsComparison(query),
     getStores(),
-    user ? getFavoriteProductIds(user.id) : Promise.resolve([])
+    getFavoriteProductIds(user.id)
   ]);
 
   return (
