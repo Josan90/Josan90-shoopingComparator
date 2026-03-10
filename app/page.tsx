@@ -3,12 +3,14 @@ import { AddStoreForm } from "@/components/add-store-form";
 import { DeleteProductButton } from "@/components/delete-product-button";
 import { EditProductForm } from "@/components/edit-product-form";
 import { FavoriteButton } from "@/components/favorite-button";
+import { PaginationControls } from "@/components/pagination-controls";
 import { PriceHistoryModal } from "@/components/price-history-modal";
 import { ProductsSearchInput } from "@/components/products-search-input";
 import { getCurrentUser } from "@/lib/auth";
 import { getFavoriteProductIds, getProductsComparison, getStores } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
+const PAGE_SIZE = 10;
 
 function normalizeSearchValue(value: string): string {
   return value
@@ -66,12 +68,13 @@ function highlightMatch(value: string, query?: string) {
 }
 
 type Props = {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 };
 
 export default async function Home({ searchParams }: Props) {
-  const { q } = await searchParams;
+  const { q, page } = await searchParams;
   const query = q?.trim();
+  const currentPage = Math.max(1, Number(page) || 1);
 
   const user = await getCurrentUser();
   const userId = user?.id;
@@ -80,6 +83,9 @@ export default async function Home({ searchParams }: Props) {
     userId ? getStores(userId) : Promise.resolve([]),
     userId ? getFavoriteProductIds(userId) : Promise.resolve([])
   ]);
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedProducts = products.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   return (
     <section className="page-stack">
@@ -112,8 +118,15 @@ export default async function Home({ searchParams }: Props) {
           </p>
         ) : (
           <>
+            <div className="results-toolbar">
+              <p className="muted">
+                Mostrando {paginatedProducts.length} de {products.length} productos.
+              </p>
+              <PaginationControls page={safePage} pathname="/" query={query} totalPages={totalPages} />
+            </div>
+
             <div className="mobile-cards">
-              {products.map((product) => (
+              {paginatedProducts.map((product) => (
                 <article className="result-card" key={product.productId}>
                   <div className="result-head">
                     <h3>{highlightMatch(product.productName, query)}</h3>
@@ -168,7 +181,7 @@ export default async function Home({ searchParams }: Props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
+                  {paginatedProducts.map((product) => (
                     <tr key={product.productId}>
                       <td>
                         <strong>{highlightMatch(product.productName, query)}</strong>
@@ -217,6 +230,8 @@ export default async function Home({ searchParams }: Props) {
                 </tbody>
               </table>
             </div>
+
+            <PaginationControls page={safePage} pathname="/" query={query} totalPages={totalPages} />
           </>
         )}
       </section>
