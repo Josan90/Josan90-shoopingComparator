@@ -17,17 +17,20 @@ export type ProductComparison = {
   }>;
 };
 
-export async function getProductsComparison(search?: string): Promise<ProductComparison[]> {
+function normalizeSearchValue(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+export async function getProductsComparison(userId: number, search?: string): Promise<ProductComparison[]> {
+  const normalizedSearch = search ? normalizeSearchValue(search) : "";
   const products = await prisma.product.findMany({
-    where: search
-      ? {
-          OR: [
-            { name: { contains: search } },
-            { brand: { contains: search } },
-            { category: { contains: search } }
-          ]
-        }
-      : undefined,
+    where: {
+      userId
+    },
     include: {
       snapshots: {
         include: { store: true },
@@ -37,7 +40,15 @@ export async function getProductsComparison(search?: string): Promise<ProductCom
     orderBy: { name: "asc" }
   });
 
-  return products.map((product) => {
+  const filteredProducts = normalizedSearch
+    ? products.filter((product) =>
+        [product.name, product.brand, product.category, product.extraInfo]
+          .filter((value): value is string => Boolean(value))
+          .some((value) => normalizeSearchValue(value).includes(normalizedSearch))
+      )
+    : products;
+
+  return filteredProducts.map((product) => {
     const latestByStore = new Map<number, (typeof product.snapshots)[number]>();
 
     for (const snapshot of product.snapshots) {
@@ -71,15 +82,19 @@ export async function getProductsComparison(search?: string): Promise<ProductCom
 
 export async function getFavoriteProductIds(userId: number): Promise<number[]> {
   const favorites = await prisma.favorite.findMany({
-    where: { userId },
+    where: {
+      userId,
+      product: { userId }
+    },
     select: { productId: true }
   });
 
   return favorites.map((fav) => fav.productId);
 }
 
-export async function getStores() {
+export async function getStores(userId: number) {
   return prisma.store.findMany({
+    where: { userId },
     orderBy: { name: "asc" },
     select: { id: true, name: true, website: true }
   });

@@ -6,7 +6,7 @@ Proyecto personal sencillo para comparar precios de productos entre supermercado
 
 - Comparador de productos con mejor precio por tienda
 - Buscador por nombre, marca o categoria
-- Favoritos por usuario autenticado (cuenta compartible)
+- Datos privados por usuario autenticado (productos, supermercados y favoritos)
 - Alta manual de productos con informacion extra y precios por supermercado
 - Esquema de datos con Prisma + PostgreSQL (Neon)
 - Seed con datos demo
@@ -78,8 +78,8 @@ Abre `http://localhost:3000`.
 
 - Registro y login por email/password.
 - Sesion con cookie HTTP-only firmada.
-- Endpoints de escritura (`products`, `stores`, `favorites`) requieren sesion.
-- Puedes compartir una misma cuenta entre varias personas para tener la misma lista de favoritos.
+- Endpoints de lectura/escritura de datos (`products`, `stores`, `favorites`) requieren sesion.
+- Cada cuenta ve y gestiona unicamente sus productos, supermercados, historico y favoritos.
 
 El seed crea (o actualiza) la cuenta inicial usando:
 

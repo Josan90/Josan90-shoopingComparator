@@ -24,13 +24,26 @@ async function main() {
       { name: "Mercadona", website: "https://www.mercadona.es" },
       { name: "Carrefour", website: "https://www.carrefour.es" },
       { name: "DIA", website: "https://www.dia.es" }
-    ].map((store) =>
-      prisma.store.upsert({
-        where: { name: store.name },
-        update: store,
-        create: store
-      })
-    )
+    ].map(async (store) => {
+      const existing = await prisma.store.findFirst({
+        where: { userId: user.id, name: store.name },
+        select: { id: true }
+      });
+
+      if (existing) {
+        return prisma.store.update({
+          where: { id: existing.id },
+          data: store
+        });
+      }
+
+      return prisma.store.create({
+        data: {
+          userId: user.id,
+          ...store
+        }
+      });
+    })
   );
 
   const baseProducts = [
@@ -64,6 +77,7 @@ async function main() {
     baseProducts.map(async (product) => {
       const existing = await prisma.product.findFirst({
         where: {
+          userId: user.id,
           name: product.name,
           brand: product.brand,
           category: product.category
@@ -77,7 +91,12 @@ async function main() {
         });
       }
       if (existing) return existing;
-      return prisma.product.create({ data: product });
+      return prisma.product.create({
+        data: {
+          userId: user.id,
+          ...product
+        }
+      });
     })
   );
 

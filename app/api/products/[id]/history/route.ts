@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getUserFromRequest, unauthorizedResponse } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 function toISODate(input: Date): string {
@@ -9,6 +10,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return unauthorizedResponse();
+  }
+
   const { id } = await params;
   const productId = Number(id);
 
@@ -19,8 +25,8 @@ export async function GET(
   const daysParam = Number(request.nextUrl.searchParams.get("days") || "30");
   const days = Number.isFinite(daysParam) ? Math.min(Math.max(daysParam, 7), 180) : 30;
 
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
+  const product = await prisma.product.findFirst({
+    where: { id: productId, userId: user.id },
     select: { id: true, name: true }
   });
 

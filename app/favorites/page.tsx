@@ -20,7 +20,7 @@ export default async function FavoritesPage() {
   }
 
   const [products, favoriteIds] = await Promise.all([
-    getProductsComparison(),
+    getProductsComparison(user.id),
     getFavoriteProductIds(user.id)
   ]);
 

@@ -9,33 +9,42 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  name      String?
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  name         String?
   passwordHash String?
-  favorites Favorite[]
-  createdAt DateTime   @default(now())
+  products     Product[]
+  stores       Store[]
+  favorites    Favorite[]
+  createdAt    DateTime  @default(now())
 }
 
 model Store {
   id        Int             @id @default(autoincrement())
+  userId    Int?
   name      String
   website   String?
+  user      User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   aliases   ProductAlias[]
   snapshots PriceSnapshot[]
 
-  @@unique([name])
+  @@unique([userId, name])
+  @@index([userId])
 }
 
 model Product {
   id        Int             @id @default(autoincrement())
+  userId    Int?
   name      String
   brand     String?
   category  String?
   extraInfo String?         @db.Text
+  user      User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   aliases   ProductAlias[]
   snapshots PriceSnapshot[]
   favorites Favorite[]
+
+  @@index([userId])
 }
 
 model ProductAlias {

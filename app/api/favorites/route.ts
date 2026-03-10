@@ -13,6 +13,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "productId es requerido" }, { status: 400 });
   }
 
+  const product = await prisma.product.findFirst({
+    where: { id: body.productId, userId: user.id },
+    select: { id: true }
+  });
+  if (!product) {
+    return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+  }
+
   await prisma.favorite.upsert({
     where: {
       userId_productId: {
@@ -39,6 +47,14 @@ export async function DELETE(request: NextRequest) {
   const body = (await request.json()) as { productId?: number };
   if (!body.productId) {
     return NextResponse.json({ error: "productId es requerido" }, { status: 400 });
+  }
+
+  const product = await prisma.product.findFirst({
+    where: { id: body.productId, userId: user.id },
+    select: { id: true }
+  });
+  if (!product) {
+    return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
   }
 
   await prisma.favorite.deleteMany({

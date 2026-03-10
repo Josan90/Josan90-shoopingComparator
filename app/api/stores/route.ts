@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "El nombre del supermercado es obligatorio" }, { status: 400 });
   }
 
-  const exists = await prisma.store.findUnique({ where: { name } });
+  const exists = await prisma.store.findFirst({ where: { userId: user.id, name } });
   if (exists) {
     return NextResponse.json({ error: "Ese supermercado ya existe" }, { status: 409 });
   }
@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
 
   await prisma.store.create({
     data: {
+      userId: user.id,
       name,
       website: website || null
     }

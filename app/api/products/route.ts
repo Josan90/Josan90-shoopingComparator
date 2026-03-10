@@ -37,10 +37,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Hay precios invalidos" }, { status: 400 });
   }
 
+  const storeIds = [...new Set(body.offers.map((offer) => offer.storeId))];
+  const allowedStoresCount = await prisma.store.count({
+    where: { userId: user.id, id: { in: storeIds } }
+  });
+  if (allowedStoresCount !== storeIds.length) {
+    return NextResponse.json({ error: "Hay supermercados invalidos o sin permiso" }, { status: 403 });
+  }
+
   try {
     const result = await prisma.$transaction(async (tx) => {
       const product = await tx.product.create({
         data: {
+          userId: user.id,
           name: body.name!.trim(),
           brand: body.brand?.trim() || null,
           category: body.category?.trim() || null,

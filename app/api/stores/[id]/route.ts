@@ -30,13 +30,14 @@ export async function PUT(
     return NextResponse.json({ error: "El nombre del supermercado es obligatorio" }, { status: 400 });
   }
 
-  const store = await prisma.store.findUnique({ where: { id: storeId } });
+  const store = await prisma.store.findFirst({ where: { id: storeId, userId: user.id } });
   if (!store) {
     return NextResponse.json({ error: "Supermercado no encontrado" }, { status: 404 });
   }
 
   const duplicate = await prisma.store.findFirst({
     where: {
+      userId: user.id,
       name,
       id: { not: storeId }
     },
@@ -74,8 +75,16 @@ export async function DELETE(
     return NextResponse.json({ error: "Supermercado invalido" }, { status: 400 });
   }
 
-  const store = await prisma.store.findUnique({ where: { id: storeId }, select: { id: true } });
-  const linkedPrices = await prisma.priceSnapshot.count({ where: { storeId } });
+  const store = await prisma.store.findFirst({
+    where: { id: storeId, userId: user.id },
+    select: { id: true }
+  });
+  const linkedPrices = await prisma.priceSnapshot.count({
+    where: {
+      storeId,
+      product: { userId: user.id }
+    }
+  });
 
   if (linkedPrices > 0) {
     return NextResponse.json(

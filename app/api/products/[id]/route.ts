@@ -45,9 +45,19 @@ export async function PUT(
     return NextResponse.json({ error: "Hay precios invalidos" }, { status: 400 });
   }
 
-  const product = await prisma.product.findUnique({ where: { id: productId } });
+  const product = await prisma.product.findFirst({ where: { id: productId, userId: user.id } });
   if (!product) {
     return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+  }
+
+  if (body.offers && body.offers.length > 0) {
+    const storeIds = [...new Set(body.offers.map((offer) => offer.storeId))];
+    const allowedStoresCount = await prisma.store.count({
+      where: { userId: user.id, id: { in: storeIds } }
+    });
+    if (allowedStoresCount !== storeIds.length) {
+      return NextResponse.json({ error: "Hay supermercados invalidos o sin permiso" }, { status: 403 });
+    }
   }
 
   try {
@@ -104,11 +114,11 @@ export async function DELETE(
     return NextResponse.json({ error: "Producto invalido" }, { status: 400 });
   }
 
-  const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true } });
-  if (!product) {
+  const deleted = await prisma.product.deleteMany({
+    where: { id: productId, userId: user.id }
+  });
+  if (deleted.count === 0) {
     return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
   }
-
-  await prisma.product.delete({ where: { id: productId } });
   return NextResponse.json({ ok: true });
 }

@@ -230,6 +230,13 @@ body {
   margin-bottom: 0.9rem;
 }
 
+.search-highlight {
+  background: #fff0b3;
+  color: inherit;
+  border-radius: 4px;
+  padding: 0 0.1rem;
+}
+
 input,
 textarea,
 button {

@@ -4,10 +4,66 @@ import { DeleteProductButton } from "@/components/delete-product-button";
 import { EditProductForm } from "@/components/edit-product-form";
 import { FavoriteButton } from "@/components/favorite-button";
 import { PriceHistoryModal } from "@/components/price-history-modal";
+import { ProductsSearchInput } from "@/components/products-search-input";
 import { getCurrentUser } from "@/lib/auth";
 import { getFavoriteProductIds, getProductsComparison, getStores } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
+
+function normalizeSearchValue(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function buildNormalizedWithMap(value: string) {
+  let normalized = "";
+  const map: number[] = [];
+
+  for (let i = 0; i < value.length; i += 1) {
+    const folded = value[i]
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    for (let j = 0; j < folded.length; j += 1) {
+      normalized += folded[j];
+      map.push(i);
+    }
+  }
+
+  return { normalized, map };
+}
+
+function highlightMatch(value: string, query?: string) {
+  if (!query) {
+    return value;
+  }
+
+  const normalizedQuery = normalizeSearchValue(query);
+  if (!normalizedQuery) {
+    return value;
+  }
+
+  const { normalized, map } = buildNormalizedWithMap(value);
+  const start = normalized.indexOf(normalizedQuery);
+  if (start === -1) {
+    return value;
+  }
+
+  const startIndex = map[start];
+  const endIndex = (map[start + normalizedQuery.length - 1] ?? startIndex) + 1;
+
+  return (
+    <>
+      {value.slice(0, startIndex)}
+      <mark className="search-highlight">{value.slice(startIndex, endIndex)}</mark>
+      {value.slice(endIndex)}
+    </>
+  );
+}
 
 type Props = {
   searchParams: Promise<{ q?: string }>;
@@ -18,10 +74,11 @@ export default async function Home({ searchParams }: Props) {
   const query = q?.trim();
 
   const user = await getCurrentUser();
+  const userId = user?.id;
   const [products, stores, favoriteIds] = await Promise.all([
-    getProductsComparison(query),
-    getStores(),
-    user ? getFavoriteProductIds(user.id) : Promise.resolve([])
+    userId ? getProductsComparison(userId, query) : Promise.resolve([]),
+    userId ? getStores(userId) : Promise.resolve([]),
+    userId ? getFavoriteProductIds(userId) : Promise.resolve([])
   ]);
 
   return (
@@ -41,23 +98,13 @@ export default async function Home({ searchParams }: Props) {
       ) : (
         <section className="panel">
           <p className="muted">
-            Estás en modo lectura. Inicia sesión para guardar favoritos y gestionar productos o supermercados.
+            Inicia sesión para ver tus productos y gestionar supermercados.
           </p>
         </section>
       )}
 
       <section className="panel">
-        <form className="search-form" method="GET">
-          <input
-            defaultValue={query || ""}
-            name="q"
-            placeholder="Busca producto, marca o categoria"
-            type="text"
-          />
-          <button className="btn-primary" type="submit">
-            Buscar
-          </button>
-        </form>
+        <ProductsSearchInput initialValue={query || ""} />
 
         {products.length === 0 ? (
           <p className="empty-state">
@@ -69,7 +116,7 @@ export default async function Home({ searchParams }: Props) {
               {products.map((product) => (
                 <article className="result-card" key={product.productId}>
                   <div className="result-head">
-                    <h3>{product.productName}</h3>
+                    <h3>{highlightMatch(product.productName, query)}</h3>
                     <div className="actions-cell">
                       {user ? (
                         <FavoriteButton
@@ -124,7 +171,7 @@ export default async function Home({ searchParams }: Props) {
                   {products.map((product) => (
                     <tr key={product.productId}>
                       <td>
-                        <strong>{product.productName}</strong>
+                        <strong>{highlightMatch(product.productName, query)}</strong>
                         <p className="muted">
                           {product.brand || "Sin marca"} | {product.category || "Sin categoria"}
                         </p>
