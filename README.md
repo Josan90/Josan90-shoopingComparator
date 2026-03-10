@@ -1,4 +1,4 @@
-# Comparador de precios (Next.js + MySQL)
+# Comparador de precios (Next.js + Neon Postgres)
 
 Proyecto personal sencillo para comparar precios de productos entre supermercados y guardar favoritos.
 
@@ -8,13 +8,13 @@ Proyecto personal sencillo para comparar precios de productos entre supermercado
 - Buscador por nombre, marca o categoria
 - Favoritos por usuario
 - Alta manual de productos con informacion extra y precios por supermercado
-- Esquema de datos con Prisma + MySQL
+- Esquema de datos con Prisma + PostgreSQL (Neon)
 - Seed con datos demo
 
 ## Requisitos
 
 - Node.js 20+
-- MySQL 8+
+- Cuenta en Neon (PostgreSQL)
 
 ## Configuracion
 
@@ -30,16 +30,19 @@ npm install
 cp .env.example .env
 ```
 
-3. Edita `DATABASE_URL` en `.env` con tu MySQL.
+3. Crea una base de datos en Neon y copia las dos cadenas:
+- `DATABASE_URL`: usa la URL **pooled** (host con `-pooler`) para la app en runtime/serverless.
+- `DIRECT_URL`: usa la URL **directa** (sin `-pooler`) para migraciones y herramientas Prisma.
 
 Ejemplo:
 
 ```env
-DATABASE_URL="mysql://root:password@localhost:3306/price_compare"
+DATABASE_URL="postgresql://USER:PASSWORD@EP-XXXX-XXXX-pooler.us-east-1.aws.neon.tech/DBNAME?sslmode=require&pgbouncer=true&connect_timeout=15"
+DIRECT_URL="postgresql://USER:PASSWORD@EP-XXXX-XXXX.us-east-1.aws.neon.tech/DBNAME?sslmode=require&connect_timeout=15"
 DEFAULT_USER_EMAIL="demo@local.dev"
 ```
 
-4. Sincroniza esquema y genera cliente:
+4. Aplica esquema y genera cliente:
 
 ```bash
 npx prisma db push
@@ -62,7 +65,7 @@ Abre `http://localhost:3000`.
 
 ## Estructura clave
 
-- `prisma/schema.prisma`: modelos MySQL (User, Product, Store, PriceSnapshot, Favorite)
+- `prisma/schema.prisma`: modelos PostgreSQL (User, Product, Store, PriceSnapshot, Favorite)
 - `app/page.tsx`: comparador principal
 - `app/favorites/page.tsx`: vista de favoritos
 - `app/api/favorites/route.ts`: alta/baja de favoritos
@@ -72,3 +75,13 @@ Abre `http://localhost:3000`.
 ## Nota actual
 
 La autenticacion no esta conectada todavia. Se usa un usuario por defecto via `DEFAULT_USER_EMAIL` para poder probar favoritos de forma inmediata.
+
+## Vercel + Neon
+
+En Vercel (Project Settings -> Environment Variables), define:
+
+- `DATABASE_URL` (Neon pooled URL)
+- `DIRECT_URL` (Neon direct URL)
+- `DEFAULT_USER_EMAIL`
+
+Con eso, cada deploy podra conectarse a Neon sin configuracion adicional en codigo.
