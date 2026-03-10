@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { AddProductForm } from "@/components/add-product-form";
 import { AddStoreForm } from "@/components/add-store-form";
 import { DeleteProductButton } from "@/components/delete-product-button";
@@ -19,14 +18,10 @@ export default async function Home({ searchParams }: Props) {
   const query = q?.trim();
 
   const user = await getCurrentUser();
-  if (!user) {
-    redirect("/login");
-  }
-
   const [products, stores, favoriteIds] = await Promise.all([
     getProductsComparison(query),
     getStores(),
-    getFavoriteProductIds(user.id)
+    user ? getFavoriteProductIds(user.id) : Promise.resolve([])
   ]);
 
   return (
@@ -38,10 +33,18 @@ export default async function Home({ searchParams }: Props) {
         </p>
       </div>
 
-      <section className="forms-grid">
-        <AddProductForm stores={stores} />
-        <AddStoreForm stores={stores} />
-      </section>
+      {user ? (
+        <section className="forms-grid">
+          <AddProductForm stores={stores} />
+          <AddStoreForm stores={stores} />
+        </section>
+      ) : (
+        <section className="panel">
+          <p className="muted">
+            Estás en modo lectura. Inicia sesión para guardar favoritos y gestionar productos o supermercados.
+          </p>
+        </section>
+      )}
 
       <section className="panel">
         <form className="search-form" method="GET">
@@ -68,13 +71,15 @@ export default async function Home({ searchParams }: Props) {
                   <div className="result-head">
                     <h3>{product.productName}</h3>
                     <div className="actions-cell">
-                      <FavoriteButton
-                        initiallyFavorite={favoriteIds.includes(product.productId)}
-                        productId={product.productId}
-                      />
+                      {user ? (
+                        <FavoriteButton
+                          initiallyFavorite={favoriteIds.includes(product.productId)}
+                          productId={product.productId}
+                        />
+                      ) : null}
                       <PriceHistoryModal productId={product.productId} productName={product.productName} />
-                      <EditProductForm product={product} stores={stores} />
-                      <DeleteProductButton productId={product.productId} />
+                      {user ? <EditProductForm product={product} stores={stores} /> : null}
+                      {user ? <DeleteProductButton productId={product.productId} /> : null}
                     </div>
                   </div>
                   <p className="muted">
@@ -149,13 +154,15 @@ export default async function Home({ searchParams }: Props) {
                       })}
                       <td>
                         <div className="actions-cell">
-                          <FavoriteButton
-                            initiallyFavorite={favoriteIds.includes(product.productId)}
-                            productId={product.productId}
-                          />
+                          {user ? (
+                            <FavoriteButton
+                              initiallyFavorite={favoriteIds.includes(product.productId)}
+                              productId={product.productId}
+                            />
+                          ) : null}
                           <PriceHistoryModal productId={product.productId} productName={product.productName} />
-                          <EditProductForm product={product} stores={stores} />
-                          <DeleteProductButton productId={product.productId} />
+                          {user ? <EditProductForm product={product} stores={stores} /> : null}
+                          {user ? <DeleteProductButton productId={product.productId} /> : null}
                         </div>
                       </td>
                     </tr>

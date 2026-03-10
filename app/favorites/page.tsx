@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { FavoriteButton } from "@/components/favorite-button";
 import { getCurrentUser } from "@/lib/auth";
 import { getFavoriteProductIds, getProductsComparison } from "@/lib/data";
@@ -9,7 +8,15 @@ export const dynamic = "force-dynamic";
 export default async function FavoritesPage() {
   const user = await getCurrentUser();
   if (!user) {
-    redirect("/login");
+    return (
+      <section className="panel">
+        <h2>Mis favoritos</h2>
+        <p className="muted">
+          Necesitas iniciar sesión para ver y gestionar favoritos. Puedes <Link href="/login">entrar</Link> o{" "}
+          <Link href="/register">crear cuenta</Link>.
+        </p>
+      </section>
+    );
   }
 
   const [products, favoriteIds] = await Promise.all([
